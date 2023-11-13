@@ -1,6 +1,17 @@
 class LinkedList {
   constructor(head = null) {
     this.head = head;
+    this.size = 0
+    if (this.head === null) {
+      this.tail = null
+    } else {
+      this.iterate((temp) => {
+        ++this.size
+        if (!temp.next) {
+          this.tail = temp
+        }
+      })
+    }
   }
 
   iterate(callback) {
@@ -45,21 +56,31 @@ class LinkedList {
 
   // add the node to the start of the list, no nodes should be removed
   addFirst(node) {
+    if (!this.tail) {
+      this.tail = node
+    }
     node.next = this.head;
     this.head = node;
+    ++this.size
   }
+
 
   // add node to end of list, no nodes should be removed
   // you may wish to use the iterate method
   addLast(node) {
     if (this.head === null) {
       this.head = node;
+      this.tail = node
+
+      ++this.size
       return;
     }
 
     this.iterate(currNode => {
       if (currNode.next === null) {
         currNode.next = node;
+        this.tail = node
+        ++this.size
         return true;
       }
     });
@@ -72,8 +93,11 @@ class LinkedList {
 
     if (this.head !== null) {
       this.head = this.head.next;
+      --this.size
     }
-
+    if (this.head === null) {
+      this.tail = null
+    }
     return oldHead;
   }
 
@@ -90,6 +114,8 @@ class LinkedList {
       if (node.next.next === null) {
         oldTail = node.next;
         node.next = null;
+        this.tail = node
+        --this.size
         return true;
       }
     });
@@ -107,6 +133,9 @@ class LinkedList {
 
     this.iterate((currNode, count) => {
       if (count === idx - 1) {
+        if (currNode.next.next === null) {//at the end
+          this.tail = node
+        }
         node.next = currNode.next.next;
         currNode.next = node;
 
@@ -127,10 +156,13 @@ class LinkedList {
 
     this.iterate((currNode, count) => {
       if (count === idx - 1) {
+        if (currNode.next === null) {
+          this.tail = node
+        }
         const oldNext = currNode.next;
         currNode.next = node;
         node.next = oldNext;
-
+        ++this.size
         return true;
       }
     });
@@ -146,19 +178,24 @@ class LinkedList {
 
     this.iterate((node, count) => {
       if (count === idx - 1) {
+        if (node.next.next === null) {
+          this.tail = node
+        }
         oldNode = node.next;
         node.next = node.next.next;
-
+        --this.size
         return true;
       }
-    }); 
+    });
 
     return oldNode;
   }
 
   clear() {
-    this.head = null;
+    this.head = null
+    this.size = 0
   }
+
 }
 
 class Node {
