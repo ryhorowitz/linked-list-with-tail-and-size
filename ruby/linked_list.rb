@@ -1,9 +1,13 @@
+require 'pry'
 class LinkedList
   attr_accessor :head 
   attr_reader :size, :tail
 
   def initialize(head = nil)
     @head = head
+    self.iterate do |node| 
+      @tail = node if node.next_node.nil?
+    end
   end
 
   def iterate
@@ -34,23 +38,29 @@ class LinkedList
   def add_first(node)
     node.next_node = @head
     @head = node
+    @tail = node if @tail.nil?
   end
 
   def add_last(node)
     if @head.nil?
       @head = node
+      @tail = node
       return
     end
 
     iterate do |curr_node|
       if curr_node.next_node.nil?
         curr_node.next_node = node
+        @tail = node
         return
       end
     end
   end
 
   def remove_first
+    if @tail == @head
+      @tail = nil
+    end
     old_head = @head
     @head = @head.next_node unless @head.nil?
     old_head
@@ -62,6 +72,7 @@ class LinkedList
     iterate do |node|
       if node.next_node.next_node.nil?
         old_tail = node.next_node
+        @tail = node
         node.next_node = nil
         return old_tail
       end
@@ -77,6 +88,8 @@ class LinkedList
 
     iterate do |curr_node, count|
       if count == idx - 1
+        # it linkedList[count] the tail
+        @tail = node if @tail == curr_node.next_node
         node.next_node = curr_node.next_node.next_node
         curr_node.next_node = node
         return node
@@ -92,6 +105,7 @@ class LinkedList
 
     iterate do |curr_node, count|
       if count == idx - 1
+        return add_last(node) if curr_node.next_node.nil?
         old_next = curr_node.next_node
         curr_node.next_node = node
         node.next_node = old_next
@@ -107,6 +121,7 @@ class LinkedList
 
     iterate do |node, count|
       if count == idx - 1
+        @tail = node if node.next_node == @tail
         old_node = node.next_node
         node.next_node = node.next_node.next_node
         return old_node
@@ -116,6 +131,13 @@ class LinkedList
 
   def clear
     @head = nil
+  end
+
+  def size
+    return 0 if @head.nil?
+    iterate do |node, count|
+      return count + 1 if node.next_node.nil?
+    end
   end
 end
 
